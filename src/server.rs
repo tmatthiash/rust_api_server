@@ -1,3 +1,6 @@
+use super::Request;
+use std::convert::TryFrom;
+use std::convert::TryInto;
 use std::{io::Read, net::TcpListener};
 
 pub struct Server {
@@ -19,9 +22,10 @@ impl Server {
                 Ok((mut stream, _)) => {
                     let mut buffer = [0; 1024];
                     match stream.read(&mut buffer) {
-                        Ok(_) => {
-                            println!("Got a request: {}", String::from_utf8_lossy(&buffer))
-                        }
+                        Ok(_) => match Request::try_from(&buffer[..]) {
+                            Ok(request) => {}
+                            Err(e) => println!("Error: {}", e),
+                        },
                         Err(e) => {
                             println!("Error: {}", e)
                         }
